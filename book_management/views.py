@@ -415,7 +415,7 @@ class ReturnBorrowBookView(APIView):
         message = "Something went wrong!!!"
         return Response(get_formatted_response(400, message))
 
-class BookDeleteView(generics.RetrieveUpdateDestroyAPIView):
+class BookDeleteView(generics.RetrieveUpdateDestroyAPIView, APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (
         JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication)
@@ -460,3 +460,70 @@ class BookDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
         message = "Something went wrong!!!"
         return Response(get_formatted_response(400, message))
+
+
+class MyBorrowedBookList(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication)
+
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    def get_queryset(self):
+        return Book.objects.filter(id__in=BookBorrower.objects.filter(student=self.request.user).values_list("book", flat=True))
+
+    def get(self, request, *args, **kwargs):
+        if self.request and not self.request.user:
+            message = "User not exist in request, Please try once again with latest token!!!"
+            return Response(get_formatted_response(200, message))
+
+        if not self.request.user.is_active:
+            message = "Your account is not activated yet, Please activate account or contact your administrator!!!"
+            return Response(get_formatted_response(400, message))
+
+        if not hasattr(self.request.user, "profile"):
+            message = "User Profile not exist, Please contact Administrator!!!"
+            return Response(get_formatted_response(200, message))
+
+        try:
+            resp = self.list(request, *args, **kwargs)
+            message = "Fetched All Users Details successfully!!!"
+            return Response(get_formatted_response(200, message, resp.data))
+        except Exception as e:
+            message = "Something went wrong while fetching Users Details!!!"
+            return Response(get_formatted_response(400, message, {}))
+
+
+class AllPendingApprovalBookListView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication)
+
+    queryset = BookBorrower.objects.all()
+    serializer_class = BookBorrowerSerializer
+
+    def get(self, request, *args, **kwargs):
+        if self.request and not self.request.user:
+            message = "User not exist in request, Please try once again with latest token!!!"
+            return Response(get_formatted_response(200, message))
+
+        if not self.request.user.is_active:
+            message = "Your account is not activated yet, Please activate account or contact your administrator!!!"
+            return Response(get_formatted_response(400, message))
+
+        if not hasattr(self.request.user, "profile"):
+            message = "User Profile not exist, Please contact Administrator!!!"
+            return Response(get_formatted_response(200, message))
+
+        if self.request.user.profile.is_member and not self.request.user.profile.is_librarian:
+            message = "As You are Logged-in as Member User, you are not authorized user to see pending approval requests!!!"
+            return Response(get_formatted_response(200, message))
+
+        try:
+            resp = self.list(request, *args, **kwargs)
+            message = "Fetched All Users Details successfully!!!"
+            return Response(get_formatted_response(200, message, resp.data))
+        except Exception as e:
+            message = "Something went wrong while fetching Users Details!!!"
+            return Response(get_formatted_response(400, message, {}))
