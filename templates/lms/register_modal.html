@@ -1,0 +1,53 @@
+{% load static %}
+
+<div class="new_registration">
+
+    <p>Enter the below information to create your new account on <a href="{% url 'index' %}">{{ settings.PLATFORM_NAME }}</a></p>
+
+    <div class="register-error-message"></div>
+
+    <div class="row">
+        <form class="login-form" method="POST" id="register_form">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}"/>
+            {% for field in register_form %}
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    {{ field }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>I agree with <a href="#">Terms and Conditions</a>
+                            <input type="checkbox" name="terms_conditions" required>
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="form-group">
+                <div class="action_btns">
+                    <div class="one_half">
+                        <a href="#" class="btn back_btn">
+                            <i class="fa fa-angle-double-left"></i> Back
+                        </a>
+                    </div>
+                    <div class="one_half last">
+                        <a href="#" class="btn btn_red" data-url="{% url 'authusers:register-librarian-user' %}" id="register_btn" data-form-id="register_form">
+                            Register as Librarian
+                        </a>
+
+                        <a href="#" class="btn btn_red" data-url="{% url 'authusers:register-member-user' %}" id="register_btn" data-form-id="register_form">
+                            Register as Member
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

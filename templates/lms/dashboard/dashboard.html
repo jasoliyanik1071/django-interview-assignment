@@ -1,0 +1,151 @@
+{% extends '../main.html' %}
+{% load static %}
+{% block pagetitle %}
+<title>Dashboard</title>
+{% endblock %}
+
+
+{% block content %}
+<div class="wrapper dashborad">
+    <div class="side-dash">
+        <div class="side-icon">
+            <div class="logo">
+                <a href="{% url 'homepage:index' %}">
+                    <img src="{% static 'images/white-logo.png' %}" alt="">
+                </a>
+
+            </div>
+        </div>
+    </div>
+    <div class="right-content">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12">
+                        <div class="profile-details content-box">
+                            <div class="img">
+                                {% if login_user.get_profile_picture %}
+                                    <img src="{{ login_user.get_profile_picture }}"><br/>
+                                {% else %}
+                                    <img src="{% static 'images/default_user_profile.png' %}">
+                                {% endif %}
+                            </div>
+
+                            <div class="content">
+                                <p>Welcome Back,</p>
+                                <h3>{{ login_user.user.first_name|default_if_none:""}} {{ login_user.middle_name|default_if_none:"" }} {{ login_user.user.last_name|default_if_none:"" }}</h3>
+                                <ul>
+                                    <li>
+                                        <a>
+                                            <i class="fa fa-phone" aria-hidden="true"></i>
+                                            {% if login_user.phone_number %}
+                                                {{ login_user.phone_number }}
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a>
+                                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                                            {% if login_user.user.email %}
+                                                {{ login_user.user.email }}
+                                            {% endif %}    
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="activity content-box">
+                            <h3> Last Activity
+                                <a href="{{activity_url}}"> Continue
+                                    <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </h3>
+                            {% if activity_obj %}
+                            <div class="img {{course_config.color_class}}">
+                                <img src="{{course_config.image.url}}">
+                            </div>
+                            <div class="content">
+                                <h4>{{course_name}}</h4>
+                                {% if activity_obj.activity == 'Video' or activity_obj.activity == 'Graded_Quiz' %}
+                                    <p>Ch. {{chapter_sequence}} - {{chapter_name}}</p>
+                                {% endif %}
+                                <ul>
+                                    <li>
+                                        <span style="font-size: 16px; line-height: 36px; color: #666666;">
+                                            {% if activity_obj.activity == 'Video' %}
+                                                <img src="{% static 'images/black-video.png' %}" alt=""> Video
+                                            {% elif activity_obj.activity == 'Graded_Quiz' %}
+                                                <img src="{% static 'images/gray-activity.png' %}" alt="" class="active">Graded Quiz
+                                            {% elif activity_obj.activity == 'Full_Portion_Test' %}
+                                                <img src="{% static 'images/gray-activity.png' %}" alt="" class="active">Full Portion Test
+                                            {% elif activity_obj.activity == 'Practice_Test' %}
+                                                <img src="{% static 'images/gray-activity.png' %}" alt="" class="active">Practice Test
+                                            {% elif activity_obj.activity == 'Challenge_Test' %}
+                                                <img src="{% static 'images/gray-activity.png' %}" alt="" class="active">Challenge Test
+                                            {% endif %}
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <span style="font-size: 16px; line-height: 36px; color: #666666;">
+                                            <img src="{% static 'images/black-clock.png' %}" alt=""> {{activity_obj.modified|timesince}} ago
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% else %}
+                                <p>No Activity to Show</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                {% regroup courses by school_id as course_by_date %}
+                {% for course_head in course_by_date %}
+                    <div style="color:black">
+                        <h3 class="combo_name">{{ course_head.grouper|default_if_none:"StudyCloud"}}</h3>
+                    
+                        <div class="row">
+                            {% for course_box in course_head.list %}
+                            {% if not course_box.is_combo_course %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="studybox">
+                                    <div class="profile-info {{course_box.course_config.color_class}}">
+                                        <div class="img">
+                                            <img src="{{ course_box.course_config.image.url }}">
+                                        </div>
+                                        <div class="content">
+                                            <h3>{{course_box.course_name}}</h3>
+                                            <ul>
+                                                <li>
+                                                    <a href="">
+                                                        <img src="{% static 'images/video.png' %}" alt=""> {{course_box.get_course_videos_quiz_count.videos_count}} Videos</a>
+                                                </li>
+                                                <li>
+                                                    <a href="">
+                                                        <img src="{% static 'images/goal.png' %}" alt=""> {{course_box.get_course_videos_quiz_count.quiz_count}} Tests</a>
+                                                </li>
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="buttonn-study {{course_box.course_config.color_class}}">
+                                        <a href="{% url 'course:course_chapters' course_id=course_box.id %}" class="btn">Start
+                                            Learning</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

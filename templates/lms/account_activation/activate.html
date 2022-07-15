@@ -1,0 +1,22 @@
+{% extends '../main.html' %}
+{% block pagetitle %}
+    <title>
+        {{ settings.PLATFORM_NAME }} | Activate Account
+    </title>
+{% endblock %}
+
+{% block content %}
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="container">
+        <div class=" activation-wrapper text-center">
+            <h1>Account Activation</h1>
+            {% if valid_activation %}
+                <h2 class="text-success">Thank you for your email confirmation.</h2>
+            {% else %}
+                <h2 class="text-danger">This account has already been activated.</h2>
+            {% endif %}
+            <a href="{% url 'index' %}" class="btn btn-warning" role="button">Explore {{ settings.PLATFORM_NAME }}</a>
+        </div>
+    </section>
+</main>
+{% endblock %}

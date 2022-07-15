@@ -1,0 +1,42 @@
+{% load static %}
+
+<p class="login-hedline">
+    Enter your email address to sign in to <a href="{% url 'index' %}">{{ settings.PLATFORM_NAME }}</a>
+</p>
+
+<div class="login-error-message text-danger"></div>
+
+<!-- login details -->
+<div class="login-form">
+    <form method="POST" name="login-form" id="login_form" class="login-form">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"/>
+        {% for field in login_form %}
+            <div class="half-input">
+                <div class="form-group">
+                    {{ field }}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="col-md-12 col-sm-12">
+            <div class="form-group">
+                <div class="action_btns">
+                    <div class="one_half">
+                        <a href="#" class="btn back_btn">
+                            <i class="fa fa-angle-double-left"></i> Back
+                        </a>
+                    </div>
+                    <div class="one_half last">
+                        <a href="#" class="btn btn_red" data-url="{% url 'authusers:user-login' %}" id="login_btn" data-form-id="login_form">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+{% block js_extra %}
+{% endblock %}
