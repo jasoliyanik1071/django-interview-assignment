@@ -15,17 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
-from django.urls import path, include
-
-from django.conf.urls import url
-
 # from django.conf.urls import url, include
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
-
+from django.contrib import admin
+from django.urls import include, path
 from rest_framework_swagger.views import get_swagger_view
-
 
 from authusers.views import index
 
@@ -33,21 +29,25 @@ schema_view = get_swagger_view(title="Library Management API")
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     path("", index, name="index"),
-
     url("swagger/", schema_view),
-
-
     # URL's :: REST for Authentication, Login, Sign-Up, Logout
-    path("api/v1/authusers/", include(("authusers.urls", "authusers"), namespace="rest_authusers")),
-
+    path(
+        "api/v1/authusers/",
+        include(("authusers.urls", "authusers"), namespace="rest_authusers"),
+    ),
     # URL's :: REST for Book Management
     # i.e:
     # As Librarian - Add, View, Update, Delete books
     # As Member - View, Borrow, Return Book
-    path("api/v1/managebook/", include(("book_management.urls", "book_management"), namespace="rest_book_management")),
+    path(
+        "api/v1/managebook/",
+        include(
+            ("book_management.urls", "book_management"),
+            namespace="rest_book_management",
+        ),
+    ),
 ]
 
 
